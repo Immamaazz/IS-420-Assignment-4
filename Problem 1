@@ -1,1 +1,16 @@
 
+SET SERVEROUTPUT ON;
+CREATE OR REPLACE FUNCTION count_child_topics(p_tid IN topics.tid%TYPE)
+RETURN Number
+IS
+  Child_count Number := 0;
+Begin
+  SELECT COUNT(*) INTO Child_count
+  FROM topics
+  WHERE ptid = p_tid;
+  RETURN Child_count;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('NO CHILD TOPICS FOUND.');
+    RETURN 0;
+END;
