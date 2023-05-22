@@ -1,1 +1,24 @@
+CREATE SEQUENCE ticket_detail_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE PROCEDURE assign_ticket_to_staff(p_tkid IN tickets.tkid%TYPE, p_sid IN support.sid%TYPE) AS
+  v_count NUMBER;
+BEGIN
+  -- Check if ticket exists
+  SELECT COUNT(*) INTO v_count FROM tickets WHERE tkid = p_tkid;
+  IF v_count = 0 THEN
+    DBMS_OUTPUT.PUT_LINE('INVALID TICKET ID');
+    RETURN;
+  END IF;
+  -- Check if support staff exists
+  SELECT COUNT(*) INTO v_count FROM support WHERE sid = p_sid;
+  IF v_count = 0 THEN
+    DBMS_OUTPUT.PUT_LINE('INVALID STAFF ID');
+    RETURN;
+  END IF;
+    -- Update ticket
+  UPDATE tickets SET sid = p_sid, status = 2 WHERE tkid = p_tkid;
+    -- Insert ticket detail
+  INSERT INTO ticket_detail (tdid, tkid, sid, tdtime, content)
+  VALUES (ticket_detail_seq.NEXTVAL, p_tkid, p_sid, systimestamp, 'ticket assigned to support staff');
+  DBMS_OUTPUT.PUT_LINE('Ticket ' || p_tkid || ' has been assigned to support staff ' || p_sid);
+END;
 
